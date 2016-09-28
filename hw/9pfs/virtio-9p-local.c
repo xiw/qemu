@@ -393,7 +393,14 @@ static int local_readdir_r(FsContext *ctx, V9fsFidOpenState *fs,
     int ret;
 
 again:
-    ret = readdir_r(fs->dir, entry, result);
+    errno = 0;
+    *result = readdir(fs->dir);
+    ret = errno;
+
+    if (*result != NULL) {
+        *entry = **result;
+    }
+
     if (ctx->export_flags & V9FS_SM_MAPPED) {
         entry->d_type = DT_UNKNOWN;
     } else if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {

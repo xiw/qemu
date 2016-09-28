@@ -681,7 +681,14 @@ static int proxy_readdir_r(FsContext *ctx, V9fsFidOpenState *fs,
                            struct dirent *entry,
                            struct dirent **result)
 {
-    return readdir_r(fs->dir, entry, result);
+    errno = 0;
+    *result =  readdir(fs->dir);
+
+    if (*result != NULL) {
+        *entry = **result;
+    }
+
+    return errno;
 }
 
 static void proxy_seekdir(FsContext *ctx, V9fsFidOpenState *fs, off_t off)
